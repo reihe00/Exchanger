@@ -8,6 +8,7 @@ import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.snthetik.exchanger.MESSAGE";
+    public static final String EXTRA_URL = "com.snthetik.exchanger.URL";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +22,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DisplayMessageActivity.class);
         EditText editText = (EditText) findViewById(R.id.editText);
         String message = editText.getText().toString();
+        EditText editText2 = (EditText) findViewById(R.id.editText2);
+        String message2 = editText2.getText().toString();
         intent.putExtra(EXTRA_MESSAGE, message);
+        intent.putExtra(EXTRA_URL,message2);
         startActivity(intent);
 
     }
