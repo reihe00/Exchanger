@@ -9,6 +9,7 @@ import android.widget.EditText;
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.snthetik.exchanger.MESSAGE";
     public static final String EXTRA_URL = "com.snthetik.exchanger.URL";
+    public static boolean connected=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,37 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_MESSAGE, message);
         intent.putExtra(EXTRA_URL,message2);
         startActivity(intent);
+        connected=true;
+    }
 
+    @Override
+    protected void onStart(){
+        if(connected) {
+            EditText editText2 = (EditText) findViewById(R.id.editText2);
+            String message2 = editText2.getText().toString();
+            Thread nhc = new NetworkHandler();
+            //((NetworkHandler) nhc).whocalledme=this;
+            ((NetworkHandler) nhc).mestoSend = "#disconnect#";
+            ((NetworkHandler) nhc).url = message2;
+            nhc.start();
+            connected=false;
+        }
+        super.onStart();
+    }
+
+    @Override
+    protected void onDestroy(){
+        if(connected) {
+            EditText editText2 = (EditText) findViewById(R.id.editText2);
+            String message2 = editText2.getText().toString();
+            Thread nhc = new NetworkHandler();
+            //((NetworkHandler) nhc).whocalledme=this;
+            ((NetworkHandler) nhc).mestoSend = "#disconnect#";
+            ((NetworkHandler) nhc).url = message2;
+            nhc.start();
+            connected=false;
+        }
+        super.onDestroy();
     }
 
 }

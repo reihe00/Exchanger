@@ -62,7 +62,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
                             public void run() {
                                 // update TextView here!
                                 if(textmodified) {
-                                    if(currentChat=="\nnull"||currentChat=="\n#disconnect#"||currentChat==null||currentChat=="\n"){
+                                    if(currentChat.contains("\nnull")||currentChat.contains("\n#disconnect#")||currentChat==null||currentChat=="\n"){
                                         finish();
                                     }
                                     TextView textView2 = findViewById((R.id.textView2));
@@ -109,7 +109,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
         }
     }
 
-    @Override
+    /*@Override
     protected void onStop(){
 
         Thread nhc = new NetworkHandler();
@@ -118,7 +118,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
         ((NetworkHandler)nhc).url=curl;
         nhc.start();
         super.onStop();
-    }
+    }*/
 
 
 }
