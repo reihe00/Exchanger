@@ -62,6 +62,9 @@ public class DisplayMessageActivity extends AppCompatActivity {
                             public void run() {
                                 // update TextView here!
                                 if(textmodified) {
+                                    if(currentChat=="\nnull"||currentChat=="\n#disconnect#"||currentChat==null||currentChat=="\n"){
+                                        finish();
+                                    }
                                     TextView textView2 = findViewById((R.id.textView2));
                                     textView2.setText(currentChat);
 
