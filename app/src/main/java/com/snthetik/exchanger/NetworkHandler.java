@@ -11,6 +11,7 @@ public class NetworkHandler extends Thread{
     public static boolean alreadylistening=false;
     public DisplayMessageActivity whocalledme;
     public String mestoSend;
+    public String pass;
     public String url;
     public boolean stayConnected=false;
     private static Socket clientSocket;
@@ -28,6 +29,7 @@ public class NetworkHandler extends Thread{
             if(!alreadylistening){
                 alreadylistening=true;
                 stayConnected=true;
+                outToServer.writeBytes(pass + "\n");
             }else{
 
                 return;

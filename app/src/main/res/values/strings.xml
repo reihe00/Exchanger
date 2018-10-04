@@ -5,4 +5,5 @@
     <string name="chat_message">Enter message...</string>
     <string name="app_connect">Connect</string>
     <string name="url_server">snthetik.com</string>
+    <string name="user_pass">Password</string>
 </resources>

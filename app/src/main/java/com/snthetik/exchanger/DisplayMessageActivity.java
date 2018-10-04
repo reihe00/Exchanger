@@ -31,7 +31,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
         curl=url;
         // Capture the layout's TextView and set the string as its text
         TextView textView = findViewById(R.id.textView);
-        textView.setText(message);
+        textView.setText(message+" on "+url);
         TextView yourTextView = findViewById((R.id.textView2));
         yourTextView.setMovementMethod(new ScrollingMovementMethod());
 
@@ -43,6 +43,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
             ((NetworkHandler) nh).whocalledme=this;
             ((NetworkHandler) nh).mestoSend=message;
             ((NetworkHandler)nh).url=url;
+            ((NetworkHandler)nh).pass=intent.getStringExtra(MainActivity.EXTRA_PASS);
             nh.start();
 
         }catch (Exception e){
@@ -66,7 +67,8 @@ public class DisplayMessageActivity extends AppCompatActivity {
                                         finish();
                                     }
                                     TextView textView2 = findViewById((R.id.textView2));
-                                    textView2.setText(currentChat);
+                                    textView2.append(currentChat);
+                                    currentChat="";
 
                                     final Layout layout = textView2.getLayout();
                                     if (layout != null) {
