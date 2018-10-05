@@ -93,13 +93,18 @@ public class DisplayMessageActivity extends AppCompatActivity {
     public void HeyImFinished(String mitwas){
         System.out.println(mitwas + "wurde empfangen");
         currentChat+="\n" + mitwas;
+        currentChat=currentChat.replaceAll("#newline#","\n");
+        currentChat=currentChat.replaceAll("#newmessage#","\n");
+
         textmodified=true;
     }
 
     public void SendMessage(View view){
         try {
             EditText editText = (EditText) findViewById(R.id.editText3);
+
             String message = editText.getText().toString();
+            System.out.println(message + " soll gesendet werden ö");
             editText.setText("");
             Thread nhc = new NetworkHandler();
             ((NetworkHandler) nhc).whocalledme=this;

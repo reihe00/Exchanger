@@ -25,11 +25,13 @@ public class NetworkHandler extends Thread{
             else System.out.println("nicht die erste nachricht");
             String answer = "";
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            outToServer.writeBytes(mestoSend + "\n");
+            outToServer.write(new String(mestoSend + "\n").getBytes("UTF8"));
+
             if(!alreadylistening){
                 alreadylistening=true;
                 stayConnected=true;
-                outToServer.writeBytes(pass + "\n");
+                outToServer.write(new String(pass + "\n").getBytes("UTF8"));
+
             }else{
 
                 return;
@@ -37,7 +39,7 @@ public class NetworkHandler extends Thread{
             while(stayConnected){
 
 
-                BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(),"UTF8"));
                 System.out.println(clientSocket.isConnected());
                 //sentence = inFromUser.readLine();
 
@@ -59,7 +61,7 @@ public class NetworkHandler extends Thread{
 
     public void sendMessageToServer(String mes) throws Exception{
         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-        outToServer.writeBytes(mes + "\n");
+        outToServer.write(new String(mes + "\n").getBytes("UTF8"));
         System.out.println("daten gesendet");
     }
 }
