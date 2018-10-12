@@ -69,7 +69,8 @@ public class NetworkHandler extends Thread{
 
                 answer = inFromServer.readLine();
                 System.out.println("antwort erhalten: " + answer);
-                if(answer==null){stayConnected=false;alreadylistening=false;}
+                if(answer==null){stayConnected=false;alreadylistening=false;NetworkHandler.aesKey=null;
+                    NetworkHandler.serverKey=null;}
                 if(answer.startsWith("#pubkey#")){
                     answer=answer.replaceAll("#pubkey#","");
                     answer=answer.replaceAll("\n","");

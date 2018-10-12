@@ -22,6 +22,9 @@ public class DisplayMessageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        NetworkHandler.aesKey=null;
+        NetworkHandler.serverKey=null;
+        NetworkHandler.alreadylistening=false;
         setContentView(R.layout.activity_display_message);
 
         // Get the Intent that started this activity and extract the string
@@ -64,6 +67,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
                                 // update TextView here!
                                 if(textmodified) {
                                     if(currentChat.endsWith("\nnull")||currentChat.contains("\n#disconnect#")||currentChat==null||currentChat=="\n"){
+
                                         finish();
                                     }
                                     TextView textView2 = findViewById((R.id.textView2));

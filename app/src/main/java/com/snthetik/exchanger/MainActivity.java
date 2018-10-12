@@ -1,7 +1,9 @@
 package com.snthetik.exchanger;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +29,17 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.snthetik.exchanger.MESSAGE";
     public static final String EXTRA_URL = "com.snthetik.exchanger.URL";
     public static final String EXTRA_PASS = "com.snthetik.exchanger.PASS";
+
+    private static final String PREFS_NAME = "preferences";
+    private static final String PREF_UNAME = "Username";
+    private static final String PREF_URL = "Url";
+
+    private final String DefaultUnameValue = "";
+    private String UnameValue;
+
+    private final String DefaultUrlValue = "snthetik.com";
+    private String UrlValue;
+
     public static boolean connected=false;
     static boolean useEncryption=false;
     static KeyPair keyPair;
@@ -37,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        loadPreferences();
         if(Build.VERSION.SDK_INT>=26){
             useEncryption=true;
             System.out.println("Trying save mode");
@@ -66,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_MESSAGE, message);
         intent.putExtra(EXTRA_URL,message2);
         intent.putExtra(EXTRA_PASS,password);
+        savePreferences();
         startActivity(intent);
         connected=true;
     }
@@ -82,7 +97,11 @@ public class MainActivity extends AppCompatActivity {
             nhc.start();
 
             connected=false;
+        }else{
+            NetworkHandler.aesKey=null;
+            NetworkHandler.serverKey=null;
         }
+
         super.onStart();
     }
 
@@ -147,6 +166,40 @@ public class MainActivity extends AppCompatActivity {
         byte[] bytePlainText = aesCipher.doFinal(code);
         String plainText = new String(bytePlainText);
         return plainText;
+    }
+
+    private void savePreferences() {
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+
+        EditText editText = (EditText) findViewById(R.id.editText);
+        String message = editText.getText().toString();
+        EditText editText2 = (EditText) findViewById(R.id.editText2);
+        String message2 = editText2.getText().toString();
+        // Edit and commit
+        UnameValue = message;
+        UrlValue = message2;
+
+        editor.putString(PREF_UNAME, UnameValue);
+        editor.putString(PREF_URL, UrlValue);
+        editor.commit();
+    }
+
+    private void loadPreferences() {
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME,
+                Context.MODE_PRIVATE);
+
+        // Get value
+        UnameValue = settings.getString(PREF_UNAME, DefaultUnameValue);
+        UrlValue = settings.getString(PREF_URL, DefaultUrlValue);
+        EditText edt_username = (EditText) findViewById(R.id.editText);
+        EditText edt_url = (EditText) findViewById(R.id.editText2);
+        edt_username.setText(UnameValue);
+        edt_url.setText(UrlValue);
+        System.out.println("onResume load name: " + UnameValue);
+        System.out.println("onResume load password: " + UrlValue);
     }
 
 }
