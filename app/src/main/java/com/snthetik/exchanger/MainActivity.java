@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -15,7 +17,11 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.snthetik.exchanger.MESSAGE";
@@ -74,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             ((NetworkHandler) nhc).mestoSend = "#disconnect#";
             ((NetworkHandler) nhc).url = message2;
             nhc.start();
+
             connected=false;
         }
         super.onStart();
@@ -122,6 +129,24 @@ public class MainActivity extends AppCompatActivity {
 
         return Base64.getEncoder().encodeToString(publicKeyBytes);
 
+    }
+
+    public static byte[] encryptAES(SecretKey aeskey, String message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
+
+        Cipher aesCipher = Cipher.getInstance("AES");
+        aesCipher.init(Cipher.ENCRYPT_MODE, aeskey);
+        byte[] byteCipherText = aesCipher.doFinal(message.getBytes("UTF8"));
+        return byteCipherText;
+    }
+
+    @TargetApi(26)
+    public static String decryptAES(SecretKey secKey, String answer) throws IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+        byte[] code=Base64.getDecoder().decode(answer);
+        Cipher aesCipher = Cipher.getInstance("AES");
+        aesCipher.init(Cipher.DECRYPT_MODE, secKey);
+        byte[] bytePlainText = aesCipher.doFinal(code);
+        String plainText = new String(bytePlainText);
+        return plainText;
     }
 
 }

@@ -63,7 +63,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
                             public void run() {
                                 // update TextView here!
                                 if(textmodified) {
-                                    if(currentChat.contains("\nnull")||currentChat.contains("\n#disconnect#")||currentChat==null||currentChat=="\n"){
+                                    if(currentChat.endsWith("\nnull")||currentChat.contains("\n#disconnect#")||currentChat==null||currentChat=="\n"){
                                         finish();
                                     }
                                     TextView textView2 = findViewById((R.id.textView2));
@@ -92,7 +92,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
 
     public void HeyImFinished(String mitwas){
         System.out.println(mitwas + "wurde empfangen");
-        currentChat+="\n" + mitwas;
+        currentChat+="\n"+mitwas;
         currentChat=currentChat.replaceAll("#newline#","\n");
         currentChat=currentChat.replaceAll("#newmessage#","\n");
 
