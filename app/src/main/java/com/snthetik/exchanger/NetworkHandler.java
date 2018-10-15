@@ -28,6 +28,8 @@ public class NetworkHandler extends Thread{
     public String url;
     public boolean stayConnected=false;
     private static Socket clientSocket;
+    private boolean loginProcedure=false;
+    public String username;
     @Override
     public void run(){
         try {
@@ -38,10 +40,11 @@ public class NetworkHandler extends Thread{
             else System.out.println("nicht die erste nachricht");
             String answer = "";
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-            if(serverKey==null||!MainActivity.useEncryption) {
+            if(alreadylistening)
+            if(serverKey==null||!MainActivity.useEncryption||aesKey==null) {
                 System.out.println("sending unencoded message: " + mestoSend);
                 outToServer.write(new String(mestoSend + "\n").getBytes("UTF8"));
-            }else{
+            }else if(loginProcedure){
                 System.out.println("sending encoded message: " + mestoSend);
                 sendEncryptedMessageToServer(mestoSend,outToServer);
             }
@@ -49,11 +52,16 @@ public class NetworkHandler extends Thread{
             if(!alreadylistening){
                 alreadylistening=true;
                 stayConnected=true;
-                outToServer.write(new String(pass + "\n").getBytes("UTF8"));
+                username=mestoSend;
+
                 if(MainActivity.useEncryption){
                     String encKey = "#pubkey#" + MainActivity.publicKeyToString(MainActivity.pubKey);
                     encKey = encKey.replaceAll("\n", "#n#") + "\n";
                     outToServer.write(encKey.getBytes("UTF8"));
+                }else{
+                    outToServer.write(new String(mestoSend + "\n").getBytes("UTF8"));
+                    outToServer.write(new String(pass + "\n").getBytes("UTF8"));
+                    loginProcedure=true;
                 }
             }else{
 
@@ -86,6 +94,11 @@ public class NetworkHandler extends Thread{
                         System.out.println(answer.length());
                         decryptAESKey(hexStringToByteArray(answer));
                         answer="AES-Key received";
+
+                        //login now
+                    sendEncryptedMessageToServer(mestoSend,outToServer);
+                    sendEncryptedMessageToServer(pass,outToServer);
+                    loginProcedure=true;
 
                 }else if(answer.startsWith("#encoded#")){
                 if(serverKey!=null&&MainActivity.useEncryption) {			//decrypt here
