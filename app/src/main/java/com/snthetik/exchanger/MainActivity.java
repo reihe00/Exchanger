@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.EditText;
 
@@ -17,7 +18,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Base64;
+//import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         loadPreferences();
-        if(Build.VERSION.SDK_INT>=26){
+        if(Build.VERSION.SDK_INT>=26||true){
             useEncryption=true;
             System.out.println("Trying save mode");
             try {
@@ -141,14 +142,16 @@ public class MainActivity extends AppCompatActivity {
         return cipher.doFinal(encrypted);
     }
 
-    @TargetApi(26)
+    //@TargetApi(26)
     public static String publicKeyToString(PublicKey p) {
 
         byte[] publicKeyBytes = p.getEncoded();
 
-        return Base64.getEncoder().encodeToString(publicKeyBytes);
-
+        //return Base64.getEncoder().encodeToString(publicKeyBytes);
+        return Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP);
     }
+
+
 
     public static byte[] encryptAES(SecretKey aeskey, String message) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException {
 
@@ -158,9 +161,10 @@ public class MainActivity extends AppCompatActivity {
         return byteCipherText;
     }
 
-    @TargetApi(26)
+   // @TargetApi(26)
     public static String decryptAES(SecretKey secKey, String answer) throws IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-        byte[] code=Base64.getDecoder().decode(answer);
+        //byte[] code=Base64.getDecoder().decode(answer);
+        byte[] code=Base64.decode(answer,Base64.NO_WRAP);
         Cipher aesCipher = Cipher.getInstance("AES");
         aesCipher.init(Cipher.DECRYPT_MODE, secKey);
         byte[] bytePlainText = aesCipher.doFinal(code);

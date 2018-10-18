@@ -1,6 +1,7 @@
 package com.snthetik.exchanger;
 
 import android.annotation.TargetApi;
+import android.util.Base64;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -10,7 +11,7 @@ import java.net.Socket;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
+//import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -28,7 +29,7 @@ public class NetworkHandler extends Thread{
     public String url;
     public boolean stayConnected=false;
     private static Socket clientSocket;
-    private boolean loginProcedure=false;
+    private static boolean loginProcedure=false;
     public String username;
     @Override
     public void run(){
@@ -40,6 +41,7 @@ public class NetworkHandler extends Thread{
             else System.out.println("nicht die erste nachricht");
             String answer = "";
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+            System.out.println("sending message: " + mestoSend + " with " + alreadylistening  + " " + loginProcedure);
             if(alreadylistening)
             if(serverKey==null||!MainActivity.useEncryption||aesKey==null) {
                 System.out.println("sending unencoded message: " + mestoSend);
@@ -61,6 +63,7 @@ public class NetworkHandler extends Thread{
                 }else{
                     outToServer.write(new String(mestoSend + "\n").getBytes("UTF8"));
                     outToServer.write(new String(pass + "\n").getBytes("UTF8"));
+
                     loginProcedure=true;
                 }
             }else{
@@ -99,6 +102,8 @@ public class NetworkHandler extends Thread{
                     sendEncryptedMessageToServer(mestoSend,outToServer);
                     sendEncryptedMessageToServer(pass,outToServer);
                     loginProcedure=true;
+                    System.out.println("login details sent");
+                    System.out.println(loginProcedure);
 
                 }else if(answer.startsWith("#encoded#")){
                 if(serverKey!=null&&MainActivity.useEncryption) {			//decrypt here
@@ -119,9 +124,10 @@ public class NetworkHandler extends Thread{
         }
     }
 
-    @TargetApi(26)
+    //@TargetApi(26)
     public void sendEncryptedMessageToServer(String mes, DataOutputStream outToServer) throws Exception{
-        String enc ="#encoded#"+Base64.getEncoder().encodeToString(MainActivity.encryptAES(aesKey,mestoSend));
+        //String enc ="#encoded#"+Base64.getEncoder().encodeToString(MainActivity.encryptAES(aesKey,mestoSend));
+        String enc ="#encoded#"+Base64.encodeToString(MainActivity.encryptAES(aesKey,mestoSend), Base64.NO_WRAP);
         enc=enc.replaceAll("\n","#n#");
         enc+="\n";
         outToServer.write(enc.getBytes(("UTF8")));
@@ -131,13 +137,14 @@ public class NetworkHandler extends Thread{
         }
     }
 
-    @TargetApi(26)
+    //@TargetApi(26)
     private void decodeKey(String answer){
         try {
             KeyFactory kf = KeyFactory.getInstance("RSA");
 
 
-            X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(answer));
+            //X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(answer));
+            X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.decode(answer, Base64.NO_WRAP));
             serverKey = kf.generatePublic(keySpecX509);
             System.out.println("Serverkey= " + MainActivity.publicKeyToString(serverKey));
             System.out.println("Clientkey= " + MainActivity.publicKeyToString(MainActivity.pubKey));
