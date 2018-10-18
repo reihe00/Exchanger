@@ -96,7 +96,8 @@ public class MainActivity extends AppCompatActivity {
             ((NetworkHandler) nhc).mestoSend = "#disconnect#";
             ((NetworkHandler) nhc).url = message2;
             nhc.start();
-
+            DisplayMessageActivity.allChats.clear();
+            DisplayMessageActivity.allUsers.clear();
             connected=false;
         }else{
             NetworkHandler.aesKey=null;

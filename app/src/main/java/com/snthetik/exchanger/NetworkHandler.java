@@ -30,7 +30,7 @@ public class NetworkHandler extends Thread{
     public boolean stayConnected=false;
     private static Socket clientSocket;
     private static boolean loginProcedure=false;
-    public String username;
+    public static String username;
     @Override
     public void run(){
         try {
@@ -47,6 +47,9 @@ public class NetworkHandler extends Thread{
                 System.out.println("sending unencoded message: " + mestoSend);
                 outToServer.write(new String(mestoSend + "\n").getBytes("UTF8"));
             }else if(loginProcedure){
+                if(!DisplayMessageActivity.currentScope.equalsIgnoreCase(url)){
+                    mestoSend="#to#" + DisplayMessageActivity.currentScope + "#to#" + mestoSend;
+                }
                 System.out.println("sending encoded message: " + mestoSend);
                 sendEncryptedMessageToServer(mestoSend,outToServer);
             }

@@ -13,12 +13,18 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.ArrayList;
+
 
 public class DisplayMessageActivity extends AppCompatActivity {
     public Thread nh;
     public String currentChat="";
-    public String curl;
+    public static String curl;
     private boolean textmodified=false;
+    public static String currentScope="";
+    public static ArrayList<String> allUsers = new ArrayList<String>();
+    public static ArrayList<String> allChats = new ArrayList<String>();
+    private int currentChatId = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +41,9 @@ public class DisplayMessageActivity extends AppCompatActivity {
         // Capture the layout's TextView and set the string as its text
         TextView textView = findViewById(R.id.textView);
         textView.setText(message+" on "+url);
+        currentChat+=url+"\n";
+        currentScope=url;
+        allChats.add(url+"\n");
         TextView yourTextView = findViewById((R.id.textView2));
         yourTextView.setMovementMethod(new ScrollingMovementMethod());
 
@@ -65,6 +74,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 // update TextView here!
+
                                 if(textmodified) {
                                     if(currentChat.endsWith("\nnull")||currentChat.contains("\n#disconnect#")||currentChat==null||currentChat=="\n"){
 
@@ -83,6 +93,27 @@ public class DisplayMessageActivity extends AppCompatActivity {
                                     }
                                     textmodified=false;
                                 }
+                                TextView textView = findViewById(R.id.textView);
+                                if(!textView.getText().toString().equalsIgnoreCase(currentScope)) {
+                                    System.out.println("Scope has changed to " + currentScope);
+                                    textView.setText(currentScope);
+                                    TextView textView2 = findViewById((R.id.textView2));
+                                    allChats.set(currentChatId,textView2.getText().toString());
+                                    boolean needstill = true;
+                                    for(int i=0;i<allChats.size();i++){
+                                        if(allChats.get(i).startsWith(currentScope)){
+                                            currentChatId=i;
+                                            textView2.setText(allChats.get(i));
+                                            needstill=false;
+                                            break;
+                                        }
+                                    }
+                                    if(needstill){
+                                        allChats.add(currentScope+"\n");
+                                        currentChatId=allChats.size()-1;
+                                        textView2.setText(allChats.get(allChats.size()-1));
+                                    }
+                                }
                             }
                         });
                     }
@@ -94,16 +125,55 @@ public class DisplayMessageActivity extends AppCompatActivity {
         thread.start();
     }
 
-    public void HeyImFinished(String mitwas){
-        System.out.println(mitwas + "wurde empfangen");
-        currentChat+="\n"+mitwas;
-        currentChat=currentChat.replaceAll("#newline#","\n");
-        currentChat=currentChat.replaceAll("#newmessage#","\n");
+    public void HeyImFinished(String antwort){
+        String[] allmsgs = antwort.split("#newmessage#");
 
-        textmodified=true;
+        for(String mitwas : allmsgs) {
+            if (mitwas.startsWith("#user#")) {
+                allUsers.clear();
+                String[] curregus = mitwas.split("#user#");
+                for (String s : curregus) {
+                    if (s.length() > 1 && !s.equalsIgnoreCase(NetworkHandler.username)) {
+                        allUsers.add(s);
+                        System.out.println(s + " added");
+                    }
+                }
+            } else if (mitwas.startsWith("#from#")) {
+                System.out.println(mitwas + "wurde empfangen");
+                mitwas = mitwas.replaceAll("#from#", "");
+                int tID = getThisID(mitwas);
+                if (currentChatId == tID) {
+
+                    currentChat += "\n" + mitwas;
+                    currentChat = currentChat.replaceAll("#newline#", "\n");
+                    currentChat = currentChat.replaceAll("#newmessage#", "\n");
+
+                    textmodified = true;
+                } else {
+                    String modify = "\n" + mitwas;
+                    modify = modify.replaceAll("#newline#", "\n");
+                    modify = modify.replaceAll("#newmessage#", "\n");
+                    allChats.set(tID, allChats.get(tID) + modify);
+                }
+            } else {
+                System.out.println(mitwas + "wurde empfangen");
+                if (currentChatId == 0) {
+                    currentChat += "\n" + mitwas;
+                    currentChat = currentChat.replaceAll("#newline#", "\n");
+                    currentChat = currentChat.replaceAll("#newmessage#", "\n");
+
+                    textmodified = true;
+                } else {
+                    String modify = "\n" + mitwas;
+                    modify = modify.replaceAll("#newline#", "\n");
+                    modify = modify.replaceAll("#newmessage#", "\n");
+                    allChats.set(0, allChats.get(0) + modify);
+                }
+            }
+        }
     }
 
-    public void SendMessage(View view){
+    public void SendMessage(View view){                     //TODO enabling sending pictures
         try {
             EditText editText = (EditText) findViewById(R.id.editText3);
 
@@ -115,9 +185,34 @@ public class DisplayMessageActivity extends AppCompatActivity {
             ((NetworkHandler) nhc).mestoSend=message;
             ((NetworkHandler)nhc).url=curl;
             nhc.start();
+            if(!currentScope.equalsIgnoreCase(curl)){
+                currentChat += "\n" + message;
+                currentChat = currentChat.replaceAll("#newline#", "\n");
+                currentChat = currentChat.replaceAll("#newmessage#", "\n");
+
+                textmodified = true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void SelectUser(View view){
+        Intent intent = new Intent(this, PickUser.class);
+
+        startActivity(intent);
+    }
+
+    private int getThisID(String mes){
+        String[] messplit = mes.split(":");
+        for(int i=0;i<allChats.size();i++){
+            if(allChats.get(i).startsWith(messplit[0])){
+                return i;
+
+            }
+        }
+        allChats.add(messplit[0]+"\n");
+        return allChats.size()-1;
     }
 
     /*@Override
