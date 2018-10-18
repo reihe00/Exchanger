@@ -63,7 +63,7 @@ public class NetworkHandler extends Thread{
                 }else{
                     outToServer.write(new String(mestoSend + "\n").getBytes("UTF8"));
                     outToServer.write(new String(pass + "\n").getBytes("UTF8"));
-
+                    System.out.println("insecure login");
                     loginProcedure=true;
                 }
             }else{
@@ -99,8 +99,12 @@ public class NetworkHandler extends Thread{
                         answer="AES-Key received";
 
                         //login now
-                    sendEncryptedMessageToServer(mestoSend,outToServer);
-                    sendEncryptedMessageToServer(pass,outToServer);
+                    String loginDetails = username+"#pass#"+pass;
+                    sendEncryptedMessageToServer(loginDetails,outToServer);
+                    System.out.println(loginDetails);
+                    //sleep(200);
+                    //sendEncryptedMessageToServer(pass,outToServer);
+                    //System.out.println(pass);
                     loginProcedure=true;
                     System.out.println("login details sent");
                     System.out.println(loginProcedure);
@@ -127,7 +131,7 @@ public class NetworkHandler extends Thread{
     //@TargetApi(26)
     public void sendEncryptedMessageToServer(String mes, DataOutputStream outToServer) throws Exception{
         //String enc ="#encoded#"+Base64.getEncoder().encodeToString(MainActivity.encryptAES(aesKey,mestoSend));
-        String enc ="#encoded#"+Base64.encodeToString(MainActivity.encryptAES(aesKey,mestoSend), Base64.NO_WRAP);
+        String enc ="#encoded#"+Base64.encodeToString(MainActivity.encryptAES(aesKey,mes), Base64.NO_WRAP);
         enc=enc.replaceAll("\n","#n#");
         enc+="\n";
         outToServer.write(enc.getBytes(("UTF8")));

@@ -108,7 +108,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
             EditText editText = (EditText) findViewById(R.id.editText3);
 
             String message = editText.getText().toString();
-            System.out.println(message + " soll gesendet werden ö");
+            System.out.println(message + " soll gesendet werden");
             editText.setText("");
             Thread nhc = new NetworkHandler();
             ((NetworkHandler) nhc).whocalledme=this;
