@@ -40,7 +40,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
         curl=url;
         // Capture the layout's TextView and set the string as its text
         TextView textView = findViewById(R.id.textView);
-        textView.setText(message+" on "+url);
+        textView.setText(url);
         currentChat+=url+"\n";
         currentScope=url;
         allChats.add(url+"\n");
@@ -98,7 +98,16 @@ public class DisplayMessageActivity extends AppCompatActivity {
                                     System.out.println("Scope has changed to " + currentScope);
                                     textView.setText(currentScope);
                                     TextView textView2 = findViewById((R.id.textView2));
+                                    if(textView2.getText().toString().startsWith(allChats.get(currentChatId)))
                                     allChats.set(currentChatId,textView2.getText().toString());
+                                    else{
+                                        for(int i=0;i<allChats.size();i++){
+                                            if(textView2.getText().toString().startsWith(allChats.get(i))){
+                                                allChats.set(i,textView2.getText().toString());
+                                                break;
+                                            }
+                                        }
+                                    }
                                     boolean needstill = true;
                                     for(int i=0;i<allChats.size();i++){
                                         if(allChats.get(i).startsWith(currentScope)){
